@@ -1,0 +1,1 @@
+export default function NotFound() { return <main className="not-found"><h1>Conversation not found</h1><p>This link may be incomplete or the archive is no longer available.</p><a href="/">Go to PropertyLab</a></main>; }
