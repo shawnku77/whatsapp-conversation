@@ -1,9 +1,11 @@
+import { isAdmin } from '@/lib/auth';
 import { loadArchive } from '@/lib/archive';
 export const runtime = 'nodejs';
 export const maxDuration = 300;
 function streamBuffer(buffer: Buffer) { let offset=0;return new ReadableStream<Uint8Array>({pull(controller){if(offset>=buffer.length){controller.close();return;}const end=Math.min(offset+64*1024,buffer.length);controller.enqueue(new Uint8Array(buffer.subarray(offset,end)));offset=end;}}); }
 const types: Record<string,string> = { jpg:'image/jpeg', jpeg:'image/jpeg', png:'image/png', webp:'image/webp', gif:'image/gif', mp4:'video/mp4', mov:'video/quicktime', opus:'audio/ogg', ogg:'audio/ogg', mp3:'audio/mpeg', m4a:'audio/mp4', aac:'audio/aac', wav:'audio/wav', pdf:'application/pdf' };
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!await isAdmin()) return new Response('Please sign in to view this attachment.', { status: 401, headers: { 'Cache-Control': 'private, no-store' } });
   try {
     const { id } = await params; const name = new URL(request.url).searchParams.get('file') || '';
     const archive = await loadArchive(id);
